@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://opendal.apache.org/blog</id>
-    <title>Apache OpenDAL Blog</title>
+    <title>Apache OpenDAL™ Blog</title>
     <updated>2023-09-15T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://opendal.apache.org/blog"/>
-    <subtitle>Apache OpenDAL Blog</subtitle>
+    <subtitle>Apache OpenDAL™ Blog</subtitle>
     <icon>https://opendal.apache.org/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[OwO #1: The v0.40 Release]]></title>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/raw/http_util/bytes_content_range.rs`."><title>bytes_content_range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../opendal/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/raw/http_util/bytes_content_range.rs`."><title>bytes_content_range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (3cdd004e5 2023-12-29)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -239,85 +240,19 @@
 <a href="#239" id="239">239</a>
 <a href="#240" id="240">240</a>
 <a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -328,7 +263,6 @@
 <span class="kw">use </span>std::ops::RangeInclusive;
 <span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">use </span><span class="kw">crate</span>::raw::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::Error;
 <span class="kw">use </span><span class="kw">crate</span>::ErrorKind;
 <span class="kw">use </span><span class="kw">crate</span>::Result;
@@ -352,9 +286,9 @@
 ///
 /// ## Allow clippy::len_without_is_empty
 ///
-/// BytesContentRange implements `len()` but not `is_empty()` because it&#39;s useless.
-/// - When BytesContentRange&#39;s range is known, it must be non-empty.
-/// - When BytesContentRange&#39;s range is no known, we don&#39;t know whether it&#39;s empty.
+/// BytesContentRange implements `len()` but not `is_empty()` because it's useless.
+/// - When BytesContentRange's range is known, it must be non-empty.
+/// - When BytesContentRange's range is no known, we don't know whether it's empty.
 </span><span class="attr">#[allow(clippy::len_without_is_empty)]
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
 </span><span class="kw">pub struct </span>BytesContentRange(
@@ -416,38 +350,17 @@
 
     <span class="doccomment">/// Convert bytes content range into Content-Range header.
     </span><span class="kw">pub fn </span>to_header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="macro">format!</span>(<span class="string">&quot;bytes {self}&quot;</span>)
-    }
-
-    <span class="doccomment">/// Calculate bytes content range from size and specified range.
-    </span><span class="kw">pub fn </span>from_bytes_range(total_size: u64, range: BytesRange) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>(start, end) = <span class="kw">match </span>(range.offset(), range.size()) {
-            (<span class="prelude-val">Some</span>(offset), <span class="prelude-val">Some</span>(size)) =&gt; (offset, offset + size - <span class="number">1</span>),
-            (<span class="prelude-val">Some</span>(offset), <span class="prelude-val">None</span>) =&gt; (offset, total_size - <span class="number">1</span>),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(size)) =&gt; (total_size - size, total_size - <span class="number">1</span>),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (<span class="number">0</span>, total_size - <span class="number">1</span>),
-        };
-
-        <span class="self">Self</span>(<span class="prelude-val">Some</span>(start), <span class="prelude-val">Some</span>(end), <span class="prelude-val">Some</span>(total_size))
-    }
-
-    <span class="doccomment">/// Calculate bytes range from bytes content range.
-    </span><span class="kw">pub fn </span>to_bytes_range(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BytesRange&gt; {
-        <span class="kw">match </span>(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>, <span class="self">self</span>.<span class="number">2</span>) {
-            (<span class="prelude-val">Some</span>(start), <span class="prelude-val">Some</span>(end), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(BytesRange::from(start..=end)),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid bytes range: {:?}&quot;</span>, <span class="self">self</span>),
-        }
+        <span class="macro">format!</span>(<span class="string">"bytes {self}"</span>)
     }
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>BytesContentRange {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">match </span>(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>, <span class="self">self</span>.<span class="number">2</span>) {
-            (<span class="prelude-val">Some</span>(start), <span class="prelude-val">Some</span>(end), <span class="prelude-val">Some</span>(size)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{start}-{end}/{size}&quot;</span>),
-            (<span class="prelude-val">Some</span>(start), <span class="prelude-val">Some</span>(end), <span class="prelude-val">None</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{start}-{end}/*&quot;</span>),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(size)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;*/{size}&quot;</span>),
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid bytes range: {:?}&quot;</span>, <span class="self">self</span>),
+            (<span class="prelude-val">Some</span>(start), <span class="prelude-val">Some</span>(end), <span class="prelude-val">Some</span>(size)) =&gt; <span class="macro">write!</span>(f, <span class="string">"{start}-{end}/{size}"</span>),
+            (<span class="prelude-val">Some</span>(start), <span class="prelude-val">Some</span>(end), <span class="prelude-val">None</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">"{start}-{end}/*"</span>),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(size)) =&gt; <span class="macro">write!</span>(f, <span class="string">"*/{size}"</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">"invalid bytes range: {:?}"</span>, <span class="self">self</span>),
         }
     }
 }
@@ -456,40 +369,40 @@
     <span class="kw">type </span><span class="prelude-val">Err </span>= Error;
 
     <span class="kw">fn </span>from_str(value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>s = value.strip_prefix(<span class="string">&quot;bytes &quot;</span>).ok_or_else(|| {
-            Error::new(ErrorKind::Unexpected, <span class="string">&quot;header content range is invalid&quot;</span>)
-                .with_operation(<span class="string">&quot;BytesContentRange::from_str&quot;</span>)
-                .with_context(<span class="string">&quot;value&quot;</span>, value)
+        <span class="kw">let </span>s = value.strip_prefix(<span class="string">"bytes "</span>).ok_or_else(|| {
+            Error::new(ErrorKind::Unexpected, <span class="string">"header content range is invalid"</span>)
+                .with_operation(<span class="string">"BytesContentRange::from_str"</span>)
+                .with_context(<span class="string">"value"</span>, value)
         })<span class="question-mark">?</span>;
 
         <span class="kw">let </span>parse_int_error = |e: std::num::ParseIntError| {
-            Error::new(ErrorKind::Unexpected, <span class="string">&quot;header content range is invalid&quot;</span>)
-                .with_operation(<span class="string">&quot;BytesContentRange::from_str&quot;</span>)
-                .with_context(<span class="string">&quot;value&quot;</span>, value)
+            Error::new(ErrorKind::Unexpected, <span class="string">"header content range is invalid"</span>)
+                .with_operation(<span class="string">"BytesContentRange::from_str"</span>)
+                .with_context(<span class="string">"value"</span>, value)
                 .set_source(e)
         };
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(size) = s.strip_prefix(<span class="string">&quot;*/&quot;</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(size) = s.strip_prefix(<span class="string">"*/"</span>) {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(
                 BytesContentRange::default().with_size(size.parse().map_err(parse_int_error)<span class="question-mark">?</span>)
             );
         }
 
-        <span class="kw">let </span>s: Vec&lt;<span class="kw">_</span>&gt; = s.split(<span class="string">&#39;/&#39;</span>).collect();
+        <span class="kw">let </span>s: Vec&lt;<span class="kw">_</span>&gt; = s.split(<span class="string">'/'</span>).collect();
         <span class="kw">if </span>s.len() != <span class="number">2 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(
-                Error::new(ErrorKind::Unexpected, <span class="string">&quot;header content range is invalid&quot;</span>)
-                    .with_operation(<span class="string">&quot;BytesContentRange::from_str&quot;</span>)
-                    .with_context(<span class="string">&quot;value&quot;</span>, value),
+                Error::new(ErrorKind::Unexpected, <span class="string">"header content range is invalid"</span>)
+                    .with_operation(<span class="string">"BytesContentRange::from_str"</span>)
+                    .with_context(<span class="string">"value"</span>, value),
             );
         }
 
-        <span class="kw">let </span>v: Vec&lt;<span class="kw">_</span>&gt; = s[<span class="number">0</span>].split(<span class="string">&#39;-&#39;</span>).collect();
+        <span class="kw">let </span>v: Vec&lt;<span class="kw">_</span>&gt; = s[<span class="number">0</span>].split(<span class="string">'-'</span>).collect();
         <span class="kw">if </span>v.len() != <span class="number">2 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(
-                Error::new(ErrorKind::Unexpected, <span class="string">&quot;header content range is invalid&quot;</span>)
-                    .with_operation(<span class="string">&quot;BytesContentRange::from_str&quot;</span>)
-                    .with_context(<span class="string">&quot;value&quot;</span>, value),
+                Error::new(ErrorKind::Unexpected, <span class="string">"header content range is invalid"</span>)
+                    .with_operation(<span class="string">"BytesContentRange::from_str"</span>)
+                    .with_context(<span class="string">"value"</span>, value),
             );
         }
         <span class="kw">let </span>start: u64 = v[<span class="number">0</span>].parse().map_err(parse_int_error)<span class="question-mark">?</span>;
@@ -497,7 +410,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>bcr = BytesContentRange::default().with_range(start, end);
 
         <span class="comment">// Handle size part first.
-        </span><span class="kw">if </span>s[<span class="number">1</span>] != <span class="string">&quot;*&quot; </span>{
+        </span><span class="kw">if </span>s[<span class="number">1</span>] != <span class="string">"*" </span>{
             bcr = bcr.with_size(s[<span class="number">1</span>].parse().map_err(parse_int_error)<span class="question-mark">?</span>)
         };
 
@@ -513,20 +426,20 @@
     </span><span class="kw">fn </span>test_bytes_content_range_from_str() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>cases = <span class="macro">vec!</span>[
             (
-                <span class="string">&quot;range start with unknown size&quot;</span>,
-                <span class="string">&quot;bytes 123-123/*&quot;</span>,
+                <span class="string">"range start with unknown size"</span>,
+                <span class="string">"bytes 123-123/*"</span>,
                 BytesContentRange::default().with_range(<span class="number">123</span>, <span class="number">123</span>),
             ),
             (
-                <span class="string">&quot;range start with known size&quot;</span>,
-                <span class="string">&quot;bytes 123-123/1024&quot;</span>,
+                <span class="string">"range start with known size"</span>,
+                <span class="string">"bytes 123-123/1024"</span>,
                 BytesContentRange::default()
                     .with_range(<span class="number">123</span>, <span class="number">123</span>)
                     .with_size(<span class="number">1024</span>),
             ),
             (
-                <span class="string">&quot;only have size&quot;</span>,
-                <span class="string">&quot;bytes */1024&quot;</span>,
+                <span class="string">"only have size"</span>,
+                <span class="string">"bytes */1024"</span>,
                 BytesContentRange::default().with_size(<span class="number">1024</span>),
             ),
         ];
@@ -534,82 +447,38 @@
         <span class="kw">for </span>(name, input, expected) <span class="kw">in </span>cases {
             <span class="kw">let </span>actual = input.parse()<span class="question-mark">?</span>;
 
-            <span class="macro">assert_eq!</span>(expected, actual, <span class="string">&quot;{name}&quot;</span>)
+            <span class="macro">assert_eq!</span>(expected, actual, <span class="string">"{name}"</span>)
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_from_bytes_range() {
-        <span class="kw">let </span>cases = <span class="macro">vec!</span>[
-            (
-                <span class="string">&quot;offset only&quot;</span>,
-                BytesRange::new(<span class="prelude-val">Some</span>(<span class="number">1024</span>), <span class="prelude-val">None</span>),
-                <span class="number">2048</span>,
-                BytesContentRange::default()
-                    .with_size(<span class="number">2048</span>)
-                    .with_range(<span class="number">1024</span>, <span class="number">2047</span>),
-            ),
-            (
-                <span class="string">&quot;size only&quot;</span>,
-                BytesRange::new(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">1024</span>)),
-                <span class="number">2048</span>,
-                BytesContentRange::default()
-                    .with_size(<span class="number">2048</span>)
-                    .with_range(<span class="number">1024</span>, <span class="number">2047</span>),
-            ),
-            (
-                <span class="string">&quot;offset zero&quot;</span>,
-                BytesRange::new(<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="prelude-val">Some</span>(<span class="number">1024</span>)),
-                <span class="number">2048</span>,
-                BytesContentRange::default()
-                    .with_size(<span class="number">2048</span>)
-                    .with_range(<span class="number">0</span>, <span class="number">1023</span>),
-            ),
-            (
-                <span class="string">&quot;part of data&quot;</span>,
-                BytesRange::new(<span class="prelude-val">Some</span>(<span class="number">1024</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>)),
-                <span class="number">4096</span>,
-                BytesContentRange::default()
-                    .with_size(<span class="number">4096</span>)
-                    .with_range(<span class="number">1024</span>, <span class="number">1024</span>),
-            ),
-        ];
-
-        <span class="kw">for </span>(name, input, input_size, expected) <span class="kw">in </span>cases {
-            <span class="kw">let </span>actual = BytesContentRange::from_bytes_range(input_size, input);
-
-            <span class="macro">assert_eq!</span>(expected, actual, <span class="string">&quot;{name}&quot;</span>)
-        }
-    }
-
-    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_bytes_content_range_to_string() {
         <span class="kw">let </span>h = BytesContentRange::default().with_size(<span class="number">1024</span>);
-        <span class="macro">assert_eq!</span>(h.to_string(), <span class="string">&quot;*/1024&quot;</span>);
+        <span class="macro">assert_eq!</span>(h.to_string(), <span class="string">"*/1024"</span>);
 
         <span class="kw">let </span>h = BytesContentRange::default().with_range(<span class="number">0</span>, <span class="number">1023</span>);
-        <span class="macro">assert_eq!</span>(h.to_string(), <span class="string">&quot;0-1023/*&quot;</span>);
+        <span class="macro">assert_eq!</span>(h.to_string(), <span class="string">"0-1023/*"</span>);
 
         <span class="kw">let </span>h = BytesContentRange::default()
             .with_range(<span class="number">0</span>, <span class="number">1023</span>)
             .with_size(<span class="number">1024</span>);
-        <span class="macro">assert_eq!</span>(h.to_string(), <span class="string">&quot;0-1023/1024&quot;</span>);
+        <span class="macro">assert_eq!</span>(h.to_string(), <span class="string">"0-1023/1024"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_bytes_content_range_to_header() {
         <span class="kw">let </span>h = BytesContentRange::default().with_size(<span class="number">1024</span>);
-        <span class="macro">assert_eq!</span>(h.to_header(), <span class="string">&quot;bytes */1024&quot;</span>);
+        <span class="macro">assert_eq!</span>(h.to_header(), <span class="string">"bytes */1024"</span>);
 
         <span class="kw">let </span>h = BytesContentRange::default().with_range(<span class="number">0</span>, <span class="number">1023</span>);
-        <span class="macro">assert_eq!</span>(h.to_header(), <span class="string">&quot;bytes 0-1023/*&quot;</span>);
+        <span class="macro">assert_eq!</span>(h.to_header(), <span class="string">"bytes 0-1023/*"</span>);
 
         <span class="kw">let </span>h = BytesContentRange::default()
             .with_range(<span class="number">0</span>, <span class="number">1023</span>)
             .with_size(<span class="number">1024</span>);
-        <span class="macro">assert_eq!</span>(h.to_header(), <span class="string">&quot;bytes 0-1023/1024&quot;</span>);
+        <span class="macro">assert_eq!</span>(h.to_header(), <span class="string">"bytes 0-1023/1024"</span>);
     }
 }
 </code></pre></div></section></main></body></html>

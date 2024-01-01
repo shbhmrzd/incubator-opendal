@@ -1,9 +1,5 @@
 var searchData=
 [
-  ['len_16',['len',['../structopendal__bytes.html#a16abed2ad211c076650d1ea81772b851',1,'opendal_bytes']]],
-  ['list_17',['list',['../structopendal__capability.html#a9df67d06090f43e325cd502231acf667',1,'opendal_capability']]],
-  ['list_5fwith_5flimit_18',['list_with_limit',['../structopendal__capability.html#afa301fcf85901fb6905305d91411aafb',1,'opendal_capability']]],
-  ['list_5fwith_5frecursive_19',['list_with_recursive',['../structopendal__capability.html#aeaa15613dad6228904b8b8150cd28a6e',1,'opendal_capability']]],
-  ['list_5fwith_5fstart_5fafter_20',['list_with_start_after',['../structopendal__capability.html#a42b57246b65b63b2595816253ffb60ff',1,'opendal_capability']]],
-  ['lister_21',['lister',['../structopendal__result__list.html#a54b9b09c29f8d867da187c32e362398a',1,'opendal_result_list']]]
+  ['inner_15',['inner',['../structopendal__entry.html#aa26d5cb8f16b95ee2f3b91f22254e597',1,'opendal_entry::inner()'],['../structopendal__lister.html#a50387dc1691da04cd020cc67df2c4295',1,'opendal_lister::inner()'],['../structopendal__metadata.html#afadf4e2bbfa3ee699d3c3d9c0a96a404',1,'opendal_metadata::inner()'],['../structopendal__operator__options.html#a0b4a1a2cd9074140b04836b822a04645',1,'opendal_operator_options::inner()'],['../structopendal__reader.html#a25070270d288274fc2fcb1e38d389718',1,'opendal_reader::inner()'],['../structopendal__operator__info.html#a16debe97406fe1ab7d01588dcb330d96',1,'opendal_operator_info::inner()']]],
+  ['is_5fexist_16',['is_exist',['../structopendal__result__is__exist.html#abe145d68333ea78b438ef92a12d9d295',1,'opendal_result_is_exist']]]
 ];

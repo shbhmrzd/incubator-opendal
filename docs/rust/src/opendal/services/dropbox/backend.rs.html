@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/services/dropbox/backend.rs`."><title>backend.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../opendal/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/services/dropbox/backend.rs`."><title>backend.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (3cdd004e5 2023-12-29)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -221,19 +222,22 @@
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
 <a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -296,20 +300,20 @@
             <span class="kw">let </span>bytes = resp.into_body().bytes().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let </span>decoded_response = serde_json::from_slice::&lt;DropboxMetadataResponse&gt;(<span class="kw-2">&amp;</span>bytes)
                 .map_err(new_json_deserialize_error)<span class="question-mark">?</span>;
-            <span class="kw">if </span><span class="string">&quot;folder&quot; </span>== decoded_response.tag {
+            <span class="kw">if </span><span class="string">"folder" </span>== decoded_response.tag {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(RpCreateDir::default());
             }
-            <span class="kw">if </span><span class="string">&quot;file&quot; </span>== decoded_response.tag {
+            <span class="kw">if </span><span class="string">"file" </span>== decoded_response.tag {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                     ErrorKind::NotADirectory,
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;it&#39;s not a directory {}&quot;</span>, path),
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"it's not a directory {}"</span>, path),
                 ));
             }
         }
 
         <span class="comment">// Dropbox has very, very, very strong limitation on the create_folder requests.
         //
-        // Let&#39;s try our best to make sure it won&#39;t failed for rate limited issues.
+        // Let's try our best to make sure it won't failed for rate limited issues.
         </span><span class="kw">let </span>res = { || <span class="self">self</span>.core.dropbox_create_folder(path) }
             .retry(<span class="kw-2">&amp;*</span>BACKOFF)
             .when(|e| e.is_temporary())
@@ -325,7 +329,10 @@
         <span class="kw">let </span>status = resp.status();
         <span class="kw">match </span>status {
             StatusCode::OK | StatusCode::PARTIAL_CONTENT =&gt; <span class="prelude-val">Ok</span>((RpRead::new(), resp.into_body())),
-            StatusCode::RANGE_NOT_SATISFIABLE =&gt; <span class="prelude-val">Ok</span>((RpRead::new(), IncomingAsyncBody::empty())),
+            StatusCode::RANGE_NOT_SATISFIABLE =&gt; {
+                resp.into_body().consume().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>((RpRead::new().with_size(<span class="prelude-val">Some</span>(<span class="number">0</span>)), IncomingAsyncBody::empty()))
+            }
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(parse_error(resp).<span class="kw">await</span><span class="question-mark">?</span>),
         }
     }
@@ -367,8 +374,8 @@
                 <span class="kw">let </span>decoded_response = serde_json::from_slice::&lt;DropboxMetadataResponse&gt;(<span class="kw-2">&amp;</span>bytes)
                     .map_err(new_json_deserialize_error)<span class="question-mark">?</span>;
                 <span class="kw">let </span>entry_mode: EntryMode = <span class="kw">match </span>decoded_response.tag.as_str() {
-                    <span class="string">&quot;file&quot; </span>=&gt; EntryMode::FILE,
-                    <span class="string">&quot;folder&quot; </span>=&gt; EntryMode::DIR,
+                    <span class="string">"file" </span>=&gt; EntryMode::FILE,
+                    <span class="string">"folder" </span>=&gt; EntryMode::DIR,
                     <span class="kw">_ </span>=&gt; EntryMode::Unknown,
                 };
 
@@ -386,7 +393,7 @@
                     } <span class="kw">else </span>{
                         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                             ErrorKind::Unexpected,
-                            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;no size found for file {}&quot;</span>, path),
+                            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"no size found for file {}"</span>, path),
                         ));
                     }
                 }
@@ -401,9 +408,9 @@
         <span class="kw">if </span>ops.len() &gt; <span class="number">1000 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                 ErrorKind::Unsupported,
-                <span class="string">&quot;dropbox services only allow delete up to 1000 keys at once&quot;</span>,
+                <span class="string">"dropbox services only allow delete up to 1000 keys at once"</span>,
             )
-            .with_context(<span class="string">&quot;length&quot;</span>, ops.len().to_string()));
+            .with_context(<span class="string">"length"</span>, ops.len().to_string()));
         }
 
         <span class="kw">let </span>paths = ops.into_iter().map(|(p, <span class="kw">_</span>)| p).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
@@ -418,15 +425,15 @@
             .map_err(new_json_deserialize_error)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>decoded_response.tag.as_str() {
-            <span class="string">&quot;complete&quot; </span>=&gt; {
+            <span class="string">"complete" </span>=&gt; {
                 <span class="kw">let </span>entries = decoded_response.entries.unwrap_or_default();
                 <span class="kw">let </span>results = <span class="self">self</span>.core.handle_batch_delete_complete_result(entries);
                 <span class="prelude-val">Ok</span>(RpBatch::new(results))
             }
-            <span class="string">&quot;async_job_id&quot; </span>=&gt; {
+            <span class="string">"async_job_id" </span>=&gt; {
                 <span class="kw">let </span>job_id = decoded_response
                     .async_job_id
-                    .expect(<span class="string">&quot;async_job_id should be present&quot;</span>);
+                    .expect(<span class="string">"async_job_id should be present"</span>);
                 <span class="kw">let </span>res = { || <span class="self">self</span>.core.dropbox_delete_batch_check(job_id.clone()) }
                     .retry(<span class="kw-2">&amp;*</span>BACKOFF)
                     .when(|e| e.is_temporary())
@@ -437,7 +444,7 @@
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(
                 ErrorKind::Unexpected,
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">&quot;delete batch failed with unexpected tag {}&quot;</span>,
+                    <span class="string">"delete batch failed with unexpected tag {}"</span>,
                     decoded_response.tag
                 ),
             )),

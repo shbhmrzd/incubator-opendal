@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/services/s3/core.rs`."><title>core.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../opendal/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/services/s3/core.rs`."><title>core.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (3cdd004e5 2023-12-29)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1002,19 +1003,41 @@
 <a href="#1002" id="1002">1002</a>
 <a href="#1003" id="1003">1003</a>
 <a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -1047,29 +1070,29 @@
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 
 <span class="kw">mod </span>constants {
-    <span class="kw">pub const </span>X_AMZ_COPY_SOURCE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;x-amz-copy-source&quot;</span>;
+    <span class="kw">pub const </span>X_AMZ_COPY_SOURCE: <span class="kw-2">&amp;</span>str = <span class="string">"x-amz-copy-source"</span>;
 
-    <span class="kw">pub const </span>X_AMZ_SERVER_SIDE_ENCRYPTION: <span class="kw-2">&amp;</span>str = <span class="string">&quot;x-amz-server-side-encryption&quot;</span>;
+    <span class="kw">pub const </span>X_AMZ_SERVER_SIDE_ENCRYPTION: <span class="kw-2">&amp;</span>str = <span class="string">"x-amz-server-side-encryption"</span>;
     <span class="kw">pub const </span>X_AMZ_SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM: <span class="kw-2">&amp;</span>str =
-        <span class="string">&quot;x-amz-server-side-encryption-customer-algorithm&quot;</span>;
+        <span class="string">"x-amz-server-side-encryption-customer-algorithm"</span>;
     <span class="kw">pub const </span>X_AMZ_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY: <span class="kw-2">&amp;</span>str =
-        <span class="string">&quot;x-amz-server-side-encryption-customer-key&quot;</span>;
+        <span class="string">"x-amz-server-side-encryption-customer-key"</span>;
     <span class="kw">pub const </span>X_AMZ_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5: <span class="kw-2">&amp;</span>str =
-        <span class="string">&quot;x-amz-server-side-encryption-customer-key-md5&quot;</span>;
+        <span class="string">"x-amz-server-side-encryption-customer-key-md5"</span>;
     <span class="kw">pub const </span>X_AMZ_SERVER_SIDE_ENCRYPTION_AWS_KMS_KEY_ID: <span class="kw-2">&amp;</span>str =
-        <span class="string">&quot;x-amz-server-side-encryption-aws-kms-key-id&quot;</span>;
-    <span class="kw">pub const </span>X_AMZ_STORAGE_CLASS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;x-amz-storage-class&quot;</span>;
+        <span class="string">"x-amz-server-side-encryption-aws-kms-key-id"</span>;
+    <span class="kw">pub const </span>X_AMZ_STORAGE_CLASS: <span class="kw-2">&amp;</span>str = <span class="string">"x-amz-storage-class"</span>;
 
     <span class="kw">pub const </span>X_AMZ_COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM: <span class="kw-2">&amp;</span>str =
-        <span class="string">&quot;x-amz-copy-source-server-side-encryption-customer-algorithm&quot;</span>;
+        <span class="string">"x-amz-copy-source-server-side-encryption-customer-algorithm"</span>;
     <span class="kw">pub const </span>X_AMZ_COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY: <span class="kw-2">&amp;</span>str =
-        <span class="string">&quot;x-amz-copy-source-server-side-encryption-customer-key&quot;</span>;
+        <span class="string">"x-amz-copy-source-server-side-encryption-customer-key"</span>;
     <span class="kw">pub const </span>X_AMZ_COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5: <span class="kw-2">&amp;</span>str =
-        <span class="string">&quot;x-amz-copy-source-server-side-encryption-customer-key-md5&quot;</span>;
+        <span class="string">"x-amz-copy-source-server-side-encryption-customer-key-md5"</span>;
 
-    <span class="kw">pub const </span>RESPONSE_CONTENT_DISPOSITION: <span class="kw-2">&amp;</span>str = <span class="string">&quot;response-content-disposition&quot;</span>;
-    <span class="kw">pub const </span>RESPONSE_CONTENT_TYPE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;response-content-type&quot;</span>;
-    <span class="kw">pub const </span>RESPONSE_CACHE_CONTROL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;response-cache-control&quot;</span>;
+    <span class="kw">pub const </span>RESPONSE_CONTENT_DISPOSITION: <span class="kw-2">&amp;</span>str = <span class="string">"response-content-disposition"</span>;
+    <span class="kw">pub const </span>RESPONSE_CONTENT_TYPE: <span class="kw-2">&amp;</span>str = <span class="string">"response-content-type"</span>;
+    <span class="kw">pub const </span>RESPONSE_CACHE_CONTROL: <span class="kw-2">&amp;</span>str = <span class="string">"response-cache-control"</span>;
 }
 
 <span class="kw">pub struct </span>S3Core {
@@ -1083,6 +1106,7 @@
     <span class="kw">pub </span>server_side_encryption_customer_key_md5: <span class="prelude-ty">Option</span>&lt;HeaderValue&gt;,
     <span class="kw">pub </span>default_storage_class: <span class="prelude-ty">Option</span>&lt;HeaderValue&gt;,
     <span class="kw">pub </span>allow_anonymous: bool,
+    <span class="kw">pub </span>disable_stat_with_override: bool,
 
     <span class="kw">pub </span>signer: AwsV4Signer,
     <span class="kw">pub </span>loader: Box&lt;<span class="kw">dyn </span>AwsCredentialLoad&gt;,
@@ -1091,11 +1115,11 @@
 }
 
 <span class="kw">impl </span>Debug <span class="kw">for </span>S3Core {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.debug_struct(<span class="string">&quot;S3Core&quot;</span>)
-            .field(<span class="string">&quot;bucket&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.bucket)
-            .field(<span class="string">&quot;endpoint&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.endpoint)
-            .field(<span class="string">&quot;root&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.root)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">"S3Core"</span>)
+            .field(<span class="string">"bucket"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.bucket)
+            .field(<span class="string">"endpoint"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.endpoint)
+            .field(<span class="string">"root"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.root)
             .finish_non_exhaustive()
     }
 }
@@ -1118,7 +1142,7 @@
             <span class="comment">// Mark this error as temporary since it could be caused by AWS STS.
             </span><span class="prelude-val">Err</span>(Error::new(
                 ErrorKind::PermissionDenied,
-                <span class="string">&quot;no valid credential found, please check configuration or try again&quot;</span>,
+                <span class="string">"no valid credential found, please check configuration or try again"</span>,
             )
             .set_temporary())
         }
@@ -1135,7 +1159,7 @@
             .sign(req, <span class="kw-2">&amp;</span>cred)
             .map_err(new_request_sign_error)<span class="question-mark">?</span>;
 
-        <span class="comment">// Always remove host header, let users&#39; client to set it based on HTTP
+        <span class="comment">// Always remove host header, let users' client to set it based on HTTP
         // version.
         //
         // As discussed in &lt;https://github.com/seanmonstar/reqwest/issues/1809&gt;,
@@ -1157,7 +1181,7 @@
             .sign_query(req, duration, <span class="kw-2">&amp;</span>cred)
             .map_err(new_request_sign_error)<span class="question-mark">?</span>;
 
-        <span class="comment">// Always remove host header, let users&#39; client to set it based on HTTP
+        <span class="comment">// Always remove host header, let users' client to set it based on HTTP
         // version.
         //
         // As discussed in &lt;https://github.com/seanmonstar/reqwest/issues/1809&gt;,
@@ -1175,7 +1199,7 @@
 
     <span class="doccomment">/// # Note
     ///
-    /// header like X_AMZ_SERVER_SIDE_ENCRYPTION doesn&#39;t need to set while
+    /// header like X_AMZ_SERVER_SIDE_ENCRYPTION doesn't need to set while
     /// get or stat.
     </span><span class="kw">pub fn </span>insert_sse_headers(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1236,25 +1260,47 @@
 }
 
 <span class="kw">impl </span>S3Core {
-    <span class="kw">pub fn </span>s3_head_object_request(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        path: <span class="kw-2">&amp;</span>str,
-        if_none_match: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-        if_match: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Request&lt;AsyncBody&gt;&gt; {
+    <span class="kw">pub fn </span>s3_head_object_request(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str, args: OpStat) -&gt; <span class="prelude-ty">Result</span>&lt;Request&lt;AsyncBody&gt;&gt; {
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
-        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
+        <span class="kw">let </span><span class="kw-2">mut </span>url = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
+
+        <span class="comment">// Add query arguments to the URL based on response overrides
+        </span><span class="kw">let </span><span class="kw-2">mut </span>query_args = Vec::new();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(override_content_disposition) = args.override_content_disposition() {
+            query_args.push(<span class="macro">format!</span>(
+                <span class="string">"{}={}"</span>,
+                constants::RESPONSE_CONTENT_DISPOSITION,
+                percent_encode_path(override_content_disposition)
+            ))
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(override_content_type) = args.override_content_type() {
+            query_args.push(<span class="macro">format!</span>(
+                <span class="string">"{}={}"</span>,
+                constants::RESPONSE_CONTENT_TYPE,
+                percent_encode_path(override_content_type)
+            ))
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(override_cache_control) = args.override_cache_control() {
+            query_args.push(<span class="macro">format!</span>(
+                <span class="string">"{}={}"</span>,
+                constants::RESPONSE_CACHE_CONTROL,
+                percent_encode_path(override_cache_control)
+            ))
+        }
+        <span class="kw">if </span>!query_args.is_empty() {
+            url.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"?{}"</span>, query_args.join(<span class="string">"&amp;"</span>)));
+        }
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::head(<span class="kw-2">&amp;</span>url);
 
         req = <span class="self">self</span>.insert_sse_headers(req, <span class="bool-val">false</span>);
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(if_none_match) = if_none_match {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(if_none_match) = args.if_none_match() {
             req = req.header(IF_NONE_MATCH, if_none_match);
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(if_match) = if_match {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(if_match) = args.if_match() {
             req = req.header(IF_MATCH, if_match);
         }
 
@@ -1269,33 +1315,33 @@
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
         <span class="comment">// Construct headers to add to the request
-        </span><span class="kw">let </span><span class="kw-2">mut </span>url = <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
+        </span><span class="kw">let </span><span class="kw-2">mut </span>url = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
 
         <span class="comment">// Add query arguments to the URL based on response overrides
         </span><span class="kw">let </span><span class="kw-2">mut </span>query_args = Vec::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(override_content_disposition) = args.override_content_disposition() {
             query_args.push(<span class="macro">format!</span>(
-                <span class="string">&quot;{}={}&quot;</span>,
+                <span class="string">"{}={}"</span>,
                 constants::RESPONSE_CONTENT_DISPOSITION,
                 percent_encode_path(override_content_disposition)
             ))
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(override_content_type) = args.override_content_type() {
             query_args.push(<span class="macro">format!</span>(
-                <span class="string">&quot;{}={}&quot;</span>,
+                <span class="string">"{}={}"</span>,
                 constants::RESPONSE_CONTENT_TYPE,
                 percent_encode_path(override_content_type)
             ))
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(override_cache_control) = args.override_cache_control() {
             query_args.push(<span class="macro">format!</span>(
-                <span class="string">&quot;{}={}&quot;</span>,
+                <span class="string">"{}={}"</span>,
                 constants::RESPONSE_CACHE_CONTROL,
                 percent_encode_path(override_cache_control)
             ))
         }
         <span class="kw">if </span>!query_args.is_empty() {
-            url.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;?{}&quot;</span>, query_args.join(<span class="string">&quot;&amp;&quot;</span>)));
+            url.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"?{}"</span>, query_args.join(<span class="string">"&amp;"</span>)));
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::get(<span class="kw-2">&amp;</span>url);
@@ -1344,7 +1390,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Request&lt;AsyncBody&gt;&gt; {
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
-        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
+        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::put(<span class="kw-2">&amp;</span>url);
 
@@ -1381,10 +1427,9 @@
     <span class="kw">pub async fn </span>s3_head_object(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         path: <span class="kw-2">&amp;</span>str,
-        if_none_match: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-        if_match: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+        args: OpStat,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>req = <span class="self">self</span>.s3_head_object_request(path, if_none_match, if_match)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>req = <span class="self">self</span>.s3_head_object_request(path, args)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.sign(<span class="kw-2">&amp;mut </span>req).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -1394,7 +1439,7 @@
     <span class="kw">pub async fn </span>s3_delete_object(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
-        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
+        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::delete(<span class="kw-2">&amp;</span>url)
             .body(AsyncBody::Empty)
@@ -1413,8 +1458,8 @@
         <span class="kw">let </span>from = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, from);
         <span class="kw">let </span>to = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, to);
 
-        <span class="kw">let </span>source = <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.bucket, percent_encode_path(<span class="kw-2">&amp;</span>from));
-        <span class="kw">let </span>target = <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>to));
+        <span class="kw">let </span>source = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, <span class="self">self</span>.bucket, percent_encode_path(<span class="kw-2">&amp;</span>from));
+        <span class="kw">let </span>target = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>to));
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::put(<span class="kw-2">&amp;</span>target);
 
@@ -1477,21 +1522,21 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>url = <span class="macro">format!</span>(<span class="string">&quot;{}?list-type=2&quot;</span>, <span class="self">self</span>.endpoint);
+        <span class="kw">let </span><span class="kw-2">mut </span>url = <span class="macro">format!</span>(<span class="string">"{}?list-type=2"</span>, <span class="self">self</span>.endpoint);
         <span class="kw">if </span>!p.is_empty() {
-            <span class="macro">write!</span>(url, <span class="string">&quot;&amp;prefix={}&quot;</span>, percent_encode_path(<span class="kw-2">&amp;</span>p))
-                .expect(<span class="string">&quot;write into string must succeed&quot;</span>);
+            <span class="macro">write!</span>(url, <span class="string">"&amp;prefix={}"</span>, percent_encode_path(<span class="kw-2">&amp;</span>p))
+                .expect(<span class="string">"write into string must succeed"</span>);
         }
         <span class="kw">if </span>!delimiter.is_empty() {
-            <span class="macro">write!</span>(url, <span class="string">&quot;&amp;delimiter={delimiter}&quot;</span>).expect(<span class="string">&quot;write into string must succeed&quot;</span>);
+            <span class="macro">write!</span>(url, <span class="string">"&amp;delimiter={delimiter}"</span>).expect(<span class="string">"write into string must succeed"</span>);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            <span class="macro">write!</span>(url, <span class="string">&quot;&amp;max-keys={limit}&quot;</span>).expect(<span class="string">&quot;write into string must succeed&quot;</span>);
+            <span class="macro">write!</span>(url, <span class="string">"&amp;max-keys={limit}"</span>).expect(<span class="string">"write into string must succeed"</span>);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(start_after) = start_after {
             <span class="kw">let </span>start_after = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, <span class="kw-2">&amp;</span>start_after);
-            <span class="macro">write!</span>(url, <span class="string">&quot;&amp;start-after={}&quot;</span>, percent_encode_path(<span class="kw-2">&amp;</span>start_after))
-                .expect(<span class="string">&quot;write into string must succeed&quot;</span>);
+            <span class="macro">write!</span>(url, <span class="string">"&amp;start-after={}"</span>, percent_encode_path(<span class="kw-2">&amp;</span>start_after))
+                .expect(<span class="string">"write into string must succeed"</span>);
         }
         <span class="kw">if </span>!continuation_token.is_empty() {
             <span class="comment">// AWS S3 could return continuation-token that contains `=`
@@ -1500,10 +1545,10 @@
             // our signer will not be confused.
             </span><span class="macro">write!</span>(
                 url,
-                <span class="string">&quot;&amp;continuation-token={}&quot;</span>,
+                <span class="string">"&amp;continuation-token={}"</span>,
                 percent_encode_path(continuation_token)
             )
-            .expect(<span class="string">&quot;write into string must succeed&quot;</span>);
+            .expect(<span class="string">"write into string must succeed"</span>);
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::get(<span class="kw-2">&amp;</span>url)
@@ -1522,7 +1567,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
-        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;{}/{}?uploads&quot;</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
+        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">"{}/{}?uploads"</span>, <span class="self">self</span>.endpoint, percent_encode_path(<span class="kw-2">&amp;</span>p));
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::post(<span class="kw-2">&amp;</span>url);
 
@@ -1566,7 +1611,7 @@
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
         <span class="kw">let </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;{}/{}?partNumber={}&amp;uploadId={}&quot;</span>,
+            <span class="string">"{}/{}?partNumber={}&amp;uploadId={}"</span>,
             <span class="self">self</span>.endpoint,
             percent_encode_path(<span class="kw-2">&amp;</span>p),
             part_number,
@@ -1595,7 +1640,7 @@
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
         <span class="kw">let </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;{}/{}?uploadId={}&quot;</span>,
+            <span class="string">"{}/{}?uploadId={}"</span>,
             <span class="self">self</span>.endpoint,
             percent_encode_path(<span class="kw-2">&amp;</span>p),
             percent_encode_path(upload_id)
@@ -1611,7 +1656,7 @@
         <span class="comment">// Make sure content length has been set to avoid post with chunked encoding.
         </span><span class="kw">let </span>req = req.header(CONTENT_LENGTH, content.len());
         <span class="comment">// Set content-type to `application/xml` to avoid mixed with form post.
-        </span><span class="kw">let </span>req = req.header(CONTENT_TYPE, <span class="string">&quot;application/xml&quot;</span>);
+        </span><span class="kw">let </span>req = req.header(CONTENT_TYPE, <span class="string">"application/xml"</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = req
             .body(AsyncBody::Bytes(Bytes::from(content)))
@@ -1631,7 +1676,7 @@
         <span class="kw">let </span>p = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
         <span class="kw">let </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;{}/{}?uploadId={}&quot;</span>,
+            <span class="string">"{}/{}?uploadId={}"</span>,
             <span class="self">self</span>.endpoint,
             percent_encode_path(<span class="kw-2">&amp;</span>p),
             percent_encode_path(upload_id)
@@ -1648,7 +1693,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         paths: Vec&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
-        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;{}/?delete&quot;</span>, <span class="self">self</span>.endpoint);
+        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">"{}/?delete"</span>, <span class="self">self</span>.endpoint);
 
         <span class="kw">let </span>req = Request::post(<span class="kw-2">&amp;</span>url);
 
@@ -1665,9 +1710,9 @@
         <span class="comment">// Make sure content length has been set to avoid post with chunked encoding.
         </span><span class="kw">let </span>req = req.header(CONTENT_LENGTH, content.len());
         <span class="comment">// Set content-type to `application/xml` to avoid mixed with form post.
-        </span><span class="kw">let </span>req = req.header(CONTENT_TYPE, <span class="string">&quot;application/xml&quot;</span>);
+        </span><span class="kw">let </span>req = req.header(CONTENT_TYPE, <span class="string">"application/xml"</span>);
         <span class="comment">// Set content-md5 as required by API.
-        </span><span class="kw">let </span>req = req.header(<span class="string">&quot;CONTENT-MD5&quot;</span>, format_content_md5(content.as_bytes()));
+        </span><span class="kw">let </span>req = req.header(<span class="string">"CONTENT-MD5"</span>, format_content_md5(content.as_bytes()));
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = req
             .body(AsyncBody::Bytes(Bytes::from(content)))
@@ -1681,37 +1726,37 @@
 
 <span class="doccomment">/// Result of CreateMultipartUpload
 </span><span class="attr">#[derive(Default, Debug, Deserialize)]
-#[serde(default, rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(default, rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>InitiateMultipartUploadResult {
     <span class="kw">pub </span>upload_id: String,
 }
 
 <span class="doccomment">/// Request of CompleteMultipartUploadRequest
 </span><span class="attr">#[derive(Default, Debug, Serialize)]
-#[serde(default, rename = <span class="string">&quot;CompleteMultipartUpload&quot;</span>, rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(default, rename = <span class="string">"CompleteMultipartUpload"</span>, rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>CompleteMultipartUploadRequest {
     <span class="kw">pub </span>part: Vec&lt;CompleteMultipartUploadRequestPart&gt;,
 }
 
 <span class="attr">#[derive(Clone, Default, Debug, Serialize)]
-#[serde(default, rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(default, rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>CompleteMultipartUploadRequestPart {
-    <span class="attr">#[serde(rename = <span class="string">&quot;PartNumber&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"PartNumber"</span>)]
     </span><span class="kw">pub </span>part_number: usize,
     <span class="doccomment">/// # TODO
     ///
-    /// quick-xml will do escape on `&quot;` which leads to our serialized output is
-    /// not the same as aws s3&#39;s example.
+    /// quick-xml will do escape on `"` which leads to our serialized output is
+    /// not the same as aws s3's example.
     ///
     /// Ideally, we could use `serialize_with` to address this (buf failed)
     ///
     /// ```ignore
     /// #[derive(Default, Debug, Serialize)]
-    /// #[serde(default, rename_all = &quot;PascalCase&quot;)]
+    /// #[serde(default, rename_all = "PascalCase")]
     /// struct CompleteMultipartUploadRequestPart {
-    ///     #[serde(rename = &quot;PartNumber&quot;)]
+    ///     #[serde(rename = "PartNumber")]
     ///     part_number: usize,
-    ///     #[serde(rename = &quot;ETag&quot;, serialize_with = &quot;partial_escape&quot;)]
+    ///     #[serde(rename = "ETag", serialize_with = "partial_escape")]
     ///     etag: String,
     /// }
     ///
@@ -1726,39 +1771,39 @@
     /// ```
     ///
     /// ref: &lt;https://github.com/tafia/quick-xml/issues/362&gt;
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;ETag&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"ETag"</span>)]
     </span><span class="kw">pub </span>etag: String,
 }
 
 <span class="doccomment">/// Request of DeleteObjects.
 </span><span class="attr">#[derive(Default, Debug, Serialize)]
-#[serde(default, rename = <span class="string">&quot;Delete&quot;</span>, rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(default, rename = <span class="string">"Delete"</span>, rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>DeleteObjectsRequest {
     <span class="kw">pub </span>object: Vec&lt;DeleteObjectsRequestObject&gt;,
 }
 
 <span class="attr">#[derive(Default, Debug, Serialize)]
-#[serde(rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>DeleteObjectsRequestObject {
     <span class="kw">pub </span>key: String,
 }
 
 <span class="doccomment">/// Result of DeleteObjects.
 </span><span class="attr">#[derive(Default, Debug, Deserialize)]
-#[serde(default, rename = <span class="string">&quot;DeleteResult&quot;</span>, rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(default, rename = <span class="string">"DeleteResult"</span>, rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>DeleteObjectsResult {
     <span class="kw">pub </span>deleted: Vec&lt;DeleteObjectsResultDeleted&gt;,
     <span class="kw">pub </span>error: Vec&lt;DeleteObjectsResultError&gt;,
 }
 
 <span class="attr">#[derive(Default, Debug, Deserialize)]
-#[serde(rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>DeleteObjectsResultDeleted {
     <span class="kw">pub </span>key: String,
 }
 
 <span class="attr">#[derive(Default, Debug, Deserialize)]
-#[serde(default, rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(default, rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>DeleteObjectsResultError {
     <span class="kw">pub </span>code: String,
     <span class="kw">pub </span>key: String,
@@ -1775,7 +1820,7 @@
 /// And enable `serde(default)` so that we can keep going even when some field
 /// is not exist.
 </span><span class="attr">#[derive(Default, Debug, Deserialize)]
-#[serde(default, rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(default, rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>ListObjectsOutput {
     <span class="kw">pub </span>is_truncated: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="kw">pub </span>next_continuation_token: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -1784,17 +1829,17 @@
 }
 
 <span class="attr">#[derive(Default, Debug, Eq, PartialEq, Deserialize)]
-#[serde(rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>ListObjectsOutputContent {
     <span class="kw">pub </span>key: String,
     <span class="kw">pub </span>size: u64,
     <span class="kw">pub </span>last_modified: String,
-    <span class="attr">#[serde(rename = <span class="string">&quot;ETag&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"ETag"</span>)]
     </span><span class="kw">pub </span>etag: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Default, Debug, Eq, PartialEq, Deserialize)]
-#[serde(rename_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[serde(rename_all = <span class="string">"PascalCase"</span>)]
 </span><span class="kw">pub struct </span>OutputCommonPrefix {
     <span class="kw">pub </span>prefix: String,
 }
@@ -1810,20 +1855,20 @@
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>test_deserialize_initiate_multipart_upload_result() {
         <span class="kw">let </span>bs = Bytes::from(
-            <span class="string">r#&quot;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-            &lt;InitiateMultipartUploadResult xmlns=&quot;http://s3.amazonaws.com/doc/2006-03-01/&quot;&gt;
+            <span class="string">r#"&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+            &lt;InitiateMultipartUploadResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"&gt;
               &lt;Bucket&gt;example-bucket&lt;/Bucket&gt;
               &lt;Key&gt;example-object&lt;/Key&gt;
               &lt;UploadId&gt;VXBsb2FkIElEIGZvciA2aWWpbmcncyBteS1tb3ZpZS5tMnRzIHVwbG9hZA&lt;/UploadId&gt;
-            &lt;/InitiateMultipartUploadResult&gt;&quot;#</span>,
+            &lt;/InitiateMultipartUploadResult&gt;"#</span>,
         );
 
         <span class="kw">let </span>out: InitiateMultipartUploadResult =
-            quick_xml::de::from_reader(bs.reader()).expect(<span class="string">&quot;must success&quot;</span>);
+            quick_xml::de::from_reader(bs.reader()).expect(<span class="string">"must success"</span>);
 
         <span class="macro">assert_eq!</span>(
             out.upload_id,
-            <span class="string">&quot;VXBsb2FkIElEIGZvciA2aWWpbmcncyBteS1tb3ZpZS5tMnRzIHVwbG9hZA&quot;
+            <span class="string">"VXBsb2FkIElEIGZvciA2aWWpbmcncyBteS1tb3ZpZS5tMnRzIHVwbG9hZA"
         </span>)
     }
 
@@ -1834,41 +1879,41 @@
             part: <span class="macro">vec!</span>[
                 CompleteMultipartUploadRequestPart {
                     part_number: <span class="number">1</span>,
-                    etag: <span class="string">&quot;\&quot;a54357aff0632cce46d942af68356b38\&quot;&quot;</span>.to_string(),
+                    etag: <span class="string">"\"a54357aff0632cce46d942af68356b38\""</span>.to_string(),
                 },
                 CompleteMultipartUploadRequestPart {
                     part_number: <span class="number">2</span>,
-                    etag: <span class="string">&quot;\&quot;0c78aef83f66abc1fa1e8477f296d394\&quot;&quot;</span>.to_string(),
+                    etag: <span class="string">"\"0c78aef83f66abc1fa1e8477f296d394\""</span>.to_string(),
                 },
                 CompleteMultipartUploadRequestPart {
                     part_number: <span class="number">3</span>,
-                    etag: <span class="string">&quot;\&quot;acbd18db4cc2f85cedef654fccc4a4d8\&quot;&quot;</span>.to_string(),
+                    etag: <span class="string">"\"acbd18db4cc2f85cedef654fccc4a4d8\""</span>.to_string(),
                 },
             ],
         };
 
-        <span class="kw">let </span>actual = quick_xml::se::to_string(<span class="kw-2">&amp;</span>req).expect(<span class="string">&quot;must succeed&quot;</span>);
+        <span class="kw">let </span>actual = quick_xml::se::to_string(<span class="kw-2">&amp;</span>req).expect(<span class="string">"must succeed"</span>);
 
         <span class="macro">pretty_assertions::assert_eq!</span>(
             actual,
-            <span class="string">r#&quot;&lt;CompleteMultipartUpload&gt;
+            <span class="string">r#"&lt;CompleteMultipartUpload&gt;
              &lt;Part&gt;
                 &lt;PartNumber&gt;1&lt;/PartNumber&gt;
-               &lt;ETag&gt;&quot;a54357aff0632cce46d942af68356b38&quot;&lt;/ETag&gt;
+               &lt;ETag&gt;"a54357aff0632cce46d942af68356b38"&lt;/ETag&gt;
              &lt;/Part&gt;
              &lt;Part&gt;
                 &lt;PartNumber&gt;2&lt;/PartNumber&gt;
-               &lt;ETag&gt;&quot;0c78aef83f66abc1fa1e8477f296d394&quot;&lt;/ETag&gt;
+               &lt;ETag&gt;"0c78aef83f66abc1fa1e8477f296d394"&lt;/ETag&gt;
              &lt;/Part&gt;
              &lt;Part&gt;
                &lt;PartNumber&gt;3&lt;/PartNumber&gt;
-               &lt;ETag&gt;&quot;acbd18db4cc2f85cedef654fccc4a4d8&quot;&lt;/ETag&gt;
+               &lt;ETag&gt;"acbd18db4cc2f85cedef654fccc4a4d8"&lt;/ETag&gt;
              &lt;/Part&gt;
-            &lt;/CompleteMultipartUpload&gt;&quot;#
+            &lt;/CompleteMultipartUpload&gt;"#
                 </span><span class="comment">// Cleanup space and new line
-                </span>.replace([<span class="string">&#39; &#39;</span>, <span class="string">&#39;\n&#39;</span>], <span class="string">&quot;&quot;</span>)
-                <span class="comment">// Escape `&quot;` by hand to address &lt;https://github.com/tafia/quick-xml/issues/362&gt;
-                </span>.replace(<span class="string">&#39;&quot;&#39;</span>, <span class="string">&quot;&amp;quot;&quot;</span>)
+                </span>.replace([<span class="string">' '</span>, <span class="string">'\n'</span>], <span class="string">""</span>)
+                <span class="comment">// Escape `"` by hand to address &lt;https://github.com/tafia/quick-xml/issues/362&gt;
+                </span>.replace(<span class="string">'"'</span>, <span class="string">"&amp;quot;"</span>)
         )
     }
 
@@ -1878,28 +1923,28 @@
         <span class="kw">let </span>req = DeleteObjectsRequest {
             object: <span class="macro">vec!</span>[
                 DeleteObjectsRequestObject {
-                    key: <span class="string">&quot;sample1.txt&quot;</span>.to_string(),
+                    key: <span class="string">"sample1.txt"</span>.to_string(),
                 },
                 DeleteObjectsRequestObject {
-                    key: <span class="string">&quot;sample2.txt&quot;</span>.to_string(),
+                    key: <span class="string">"sample2.txt"</span>.to_string(),
                 },
             ],
         };
 
-        <span class="kw">let </span>actual = quick_xml::se::to_string(<span class="kw-2">&amp;</span>req).expect(<span class="string">&quot;must succeed&quot;</span>);
+        <span class="kw">let </span>actual = quick_xml::se::to_string(<span class="kw-2">&amp;</span>req).expect(<span class="string">"must succeed"</span>);
 
         <span class="macro">pretty_assertions::assert_eq!</span>(
             actual,
-            <span class="string">r#&quot;&lt;Delete&gt;
+            <span class="string">r#"&lt;Delete&gt;
              &lt;Object&gt;
              &lt;Key&gt;sample1.txt&lt;/Key&gt;
              &lt;/Object&gt;
              &lt;Object&gt;
                &lt;Key&gt;sample2.txt&lt;/Key&gt;
              &lt;/Object&gt;
-             &lt;/Delete&gt;&quot;#
+             &lt;/Delete&gt;"#
                 </span><span class="comment">// Cleanup space and new line
-                </span>.replace([<span class="string">&#39; &#39;</span>, <span class="string">&#39;\n&#39;</span>], <span class="string">&quot;&quot;</span>)
+                </span>.replace([<span class="string">' '</span>, <span class="string">'\n'</span>], <span class="string">""</span>)
         )
     }
 
@@ -1907,8 +1952,8 @@
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>test_deserialize_delete_objects_result() {
         <span class="kw">let </span>bs = Bytes::from(
-            <span class="string">r#&quot;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-            &lt;DeleteResult xmlns=&quot;http://s3.amazonaws.com/doc/2006-03-01/&quot;&gt;
+            <span class="string">r#"&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+            &lt;DeleteResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"&gt;
              &lt;Deleted&gt;
                &lt;Key&gt;sample1.txt&lt;/Key&gt;
              &lt;/Deleted&gt;
@@ -1917,24 +1962,24 @@
               &lt;Code&gt;AccessDenied&lt;/Code&gt;
               &lt;Message&gt;Access Denied&lt;/Message&gt;
              &lt;/Error&gt;
-            &lt;/DeleteResult&gt;&quot;#</span>,
+            &lt;/DeleteResult&gt;"#</span>,
         );
 
         <span class="kw">let </span>out: DeleteObjectsResult =
-            quick_xml::de::from_reader(bs.reader()).expect(<span class="string">&quot;must success&quot;</span>);
+            quick_xml::de::from_reader(bs.reader()).expect(<span class="string">"must success"</span>);
 
         <span class="macro">assert_eq!</span>(out.deleted.len(), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(out.deleted[<span class="number">0</span>].key, <span class="string">&quot;sample1.txt&quot;</span>);
+        <span class="macro">assert_eq!</span>(out.deleted[<span class="number">0</span>].key, <span class="string">"sample1.txt"</span>);
         <span class="macro">assert_eq!</span>(out.error.len(), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(out.error[<span class="number">0</span>].key, <span class="string">&quot;sample2.txt&quot;</span>);
-        <span class="macro">assert_eq!</span>(out.error[<span class="number">0</span>].code, <span class="string">&quot;AccessDenied&quot;</span>);
-        <span class="macro">assert_eq!</span>(out.error[<span class="number">0</span>].message, <span class="string">&quot;Access Denied&quot;</span>);
+        <span class="macro">assert_eq!</span>(out.error[<span class="number">0</span>].key, <span class="string">"sample2.txt"</span>);
+        <span class="macro">assert_eq!</span>(out.error[<span class="number">0</span>].code, <span class="string">"AccessDenied"</span>);
+        <span class="macro">assert_eq!</span>(out.error[<span class="number">0</span>].message, <span class="string">"Access Denied"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_parse_list_output() {
         <span class="kw">let </span>bs = bytes::Bytes::from(
-            <span class="string">r#&quot;&lt;ListBucketResult xmlns=&quot;http://s3.amazonaws.com/doc/2006-03-01/&quot;&gt;
+            <span class="string">r#"&lt;ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"&gt;
   &lt;Name&gt;example-bucket&lt;/Name&gt;
   &lt;Prefix&gt;photos/2006/&lt;/Prefix&gt;
   &lt;KeyCount&gt;3&lt;/KeyCount&gt;
@@ -1944,14 +1989,14 @@
   &lt;Contents&gt;
     &lt;Key&gt;photos/2006&lt;/Key&gt;
     &lt;LastModified&gt;2016-04-30T23:51:29.000Z&lt;/LastModified&gt;
-    &lt;ETag&gt;&quot;d41d8cd98f00b204e9800998ecf8427e&quot;&lt;/ETag&gt;
+    &lt;ETag&gt;"d41d8cd98f00b204e9800998ecf8427e"&lt;/ETag&gt;
     &lt;Size&gt;56&lt;/Size&gt;
     &lt;StorageClass&gt;STANDARD&lt;/StorageClass&gt;
   &lt;/Contents&gt;
   &lt;Contents&gt;
     &lt;Key&gt;photos/2007&lt;/Key&gt;
     &lt;LastModified&gt;2016-04-30T23:51:29.000Z&lt;/LastModified&gt;
-    &lt;ETag&gt;&quot;d41d8cd98f00b204e9800998ecf8427e&quot;&lt;/ETag&gt;
+    &lt;ETag&gt;"d41d8cd98f00b204e9800998ecf8427e"&lt;/ETag&gt;
     &lt;Size&gt;100&lt;/Size&gt;
     &lt;StorageClass&gt;STANDARD&lt;/StorageClass&gt;
   &lt;/Contents&gt;
@@ -1967,10 +2012,10 @@
   &lt;CommonPrefixes&gt;
     &lt;Prefix&gt;photos/2006/January/&lt;/Prefix&gt;
   &lt;/CommonPrefixes&gt;
-&lt;/ListBucketResult&gt;&quot;#</span>,
+&lt;/ListBucketResult&gt;"#</span>,
         );
 
-        <span class="kw">let </span>out: ListObjectsOutput = quick_xml::de::from_reader(bs.reader()).expect(<span class="string">&quot;must success&quot;</span>);
+        <span class="kw">let </span>out: ListObjectsOutput = quick_xml::de::from_reader(bs.reader()).expect(<span class="string">"must success"</span>);
 
         <span class="macro">assert!</span>(!out.is_truncated.unwrap());
         <span class="macro">assert!</span>(out.next_continuation_token.is_none());
@@ -1979,27 +2024,27 @@
                 .iter()
                 .map(|v| v.prefix.clone())
                 .collect::&lt;Vec&lt;String&gt;&gt;(),
-            <span class="macro">vec!</span>[<span class="string">&quot;photos/2006/February/&quot;</span>, <span class="string">&quot;photos/2006/January/&quot;</span>]
+            <span class="macro">vec!</span>[<span class="string">"photos/2006/February/"</span>, <span class="string">"photos/2006/January/"</span>]
         );
         <span class="macro">assert_eq!</span>(
             out.contents,
             <span class="macro">vec!</span>[
                 ListObjectsOutputContent {
-                    key: <span class="string">&quot;photos/2006&quot;</span>.to_string(),
+                    key: <span class="string">"photos/2006"</span>.to_string(),
                     size: <span class="number">56</span>,
-                    etag: <span class="prelude-val">Some</span>(<span class="string">&quot;\&quot;d41d8cd98f00b204e9800998ecf8427e\&quot;&quot;</span>.to_string()),
-                    last_modified: <span class="string">&quot;2016-04-30T23:51:29.000Z&quot;</span>.to_string(),
+                    etag: <span class="prelude-val">Some</span>(<span class="string">"\"d41d8cd98f00b204e9800998ecf8427e\""</span>.to_string()),
+                    last_modified: <span class="string">"2016-04-30T23:51:29.000Z"</span>.to_string(),
                 },
                 ListObjectsOutputContent {
-                    key: <span class="string">&quot;photos/2007&quot;</span>.to_string(),
+                    key: <span class="string">"photos/2007"</span>.to_string(),
                     size: <span class="number">100</span>,
-                    last_modified: <span class="string">&quot;2016-04-30T23:51:29.000Z&quot;</span>.to_string(),
-                    etag: <span class="prelude-val">Some</span>(<span class="string">&quot;\&quot;d41d8cd98f00b204e9800998ecf8427e\&quot;&quot;</span>.to_string()),
+                    last_modified: <span class="string">"2016-04-30T23:51:29.000Z"</span>.to_string(),
+                    etag: <span class="prelude-val">Some</span>(<span class="string">"\"d41d8cd98f00b204e9800998ecf8427e\""</span>.to_string()),
                 },
                 ListObjectsOutputContent {
-                    key: <span class="string">&quot;photos/2008&quot;</span>.to_string(),
+                    key: <span class="string">"photos/2008"</span>.to_string(),
                     size: <span class="number">42</span>,
-                    last_modified: <span class="string">&quot;2016-05-30T23:51:29.000Z&quot;</span>.to_string(),
+                    last_modified: <span class="string">"2016-05-30T23:51:29.000Z"</span>.to_string(),
                     etag: <span class="prelude-val">None</span>,
                 },
             ]

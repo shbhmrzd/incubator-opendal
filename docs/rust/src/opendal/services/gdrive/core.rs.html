@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/services/gdrive/core.rs`."><title>core.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../opendal/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/services/gdrive/core.rs`."><title>core.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (3cdd004e5 2023-12-29)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -570,40 +571,19 @@
 <a href="#570" id="570">570</a>
 <a href="#571" id="571">571</a>
 <a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
-<a href="#575" id="575">575</a>
-<a href="#576" id="576">576</a>
-<a href="#577" id="577">577</a>
-<a href="#578" id="578">578</a>
-<a href="#579" id="579">579</a>
-<a href="#580" id="580">580</a>
-<a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-<a href="#586" id="586">586</a>
-<a href="#587" id="587">587</a>
-<a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -617,7 +597,6 @@
 <span class="kw">use </span>bytes::Bytes;
 <span class="kw">use </span>chrono::DateTime;
 <span class="kw">use </span>chrono::Utc;
-<span class="kw">use </span>futures::stream;
 <span class="kw">use </span>http::header;
 <span class="kw">use </span>http::Request;
 <span class="kw">use </span>http::Response;
@@ -652,9 +631,9 @@
 }
 
 <span class="kw">impl </span>Debug <span class="kw">for </span>GdriveCore {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="kw">let </span><span class="kw-2">mut </span>de = f.debug_struct(<span class="string">&quot;GdriveCore&quot;</span>);
-        de.field(<span class="string">&quot;root&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.root);
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>de = f.debug_struct(<span class="string">"GdriveCore"</span>);
+        de.field(<span class="string">"root"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.root);
         de.finish()
     }
 }
@@ -670,26 +649,26 @@
     /// - A path is a sequence of file names separated by slashes.
     /// - A file only knows its parent id, but not its name.
     /// - To find the file id of a file, we need to traverse the path from the root to the file.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>get_file_id_by_path(<span class="kw-2">&amp;</span><span class="self">self</span>, file_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>get_file_id_by_path(<span class="kw-2">&amp;</span><span class="self">self</span>, file_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
         <span class="kw">let </span>path = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, file_path);
 
         <span class="kw">let </span><span class="kw-2">mut </span>cache = <span class="self">self</span>.path_cache.lock().<span class="kw">await</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = cache.get(<span class="kw-2">&amp;</span>path) {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(id.to_owned());
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(id.to_owned()));
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>parent_id = <span class="string">&quot;root&quot;</span>.to_owned();
-        <span class="kw">let </span>file_path_items: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = path.split(<span class="string">&#39;/&#39;</span>).filter(|<span class="kw-2">&amp;</span>x| !x.is_empty()).collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>parent_id = <span class="string">"root"</span>.to_owned();
+        <span class="kw">let </span>file_path_items: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = path.split(<span class="string">'/'</span>).filter(|<span class="kw-2">&amp;</span>x| !x.is_empty()).collect();
 
         <span class="kw">for </span>(i, item) <span class="kw">in </span>file_path_items.iter().enumerate() {
-            <span class="kw">let </span>path_part = file_path_items[<span class="number">0</span>..=i].join(<span class="string">&quot;/&quot;</span>);
+            <span class="kw">let </span>path_part = file_path_items[<span class="number">0</span>..=i].join(<span class="string">"/"</span>);
             <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = cache.get(<span class="kw-2">&amp;</span>path_part) {
                 parent_id = id.to_owned();
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">let </span>id = <span class="kw">if </span>i != file_path_items.len() - <span class="number">1 </span>|| path.ends_with(<span class="string">&#39;/&#39;</span>) {
+            <span class="kw">let </span>id = <span class="kw">if </span>i != file_path_items.len() - <span class="number">1 </span>|| path.ends_with(<span class="string">'/'</span>) {
                 <span class="self">self</span>.gdrive_search_folder(<span class="kw-2">&amp;</span>parent_id, item).<span class="kw">await</span><span class="question-mark">?
             </span>} <span class="kw">else </span>{
                 <span class="self">self</span>.gdrive_search_file(<span class="kw-2">&amp;</span>parent_id, item)
@@ -701,15 +680,11 @@
                 parent_id = id;
                 cache.insert(path_part, parent_id.clone());
             } <span class="kw">else </span>{
-                <span class="comment">// TODO: return None instead of error.
-                </span><span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
-                    ErrorKind::NotFound,
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;path not found: {}&quot;</span>, item),
-                ));
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             };
         }
 
-        <span class="prelude-val">Ok</span>(parent_id)
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(parent_id))
     }
 
     <span class="doccomment">/// Ensure the parent path exists.
@@ -722,14 +697,14 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>ensure_parent_path(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
         <span class="kw">let </span>path = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, path);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>parent: String = <span class="string">&quot;root&quot;</span>.to_owned();
-        <span class="kw">let </span><span class="kw-2">mut </span>file_path_items: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = path.split(<span class="string">&#39;/&#39;</span>).filter(|<span class="kw-2">&amp;</span>x| !x.is_empty()).collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>parent: String = <span class="string">"root"</span>.to_owned();
+        <span class="kw">let </span><span class="kw-2">mut </span>file_path_items: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = path.split(<span class="string">'/'</span>).filter(|<span class="kw-2">&amp;</span>x| !x.is_empty()).collect();
         file_path_items.pop();
 
         <span class="kw">let </span><span class="kw-2">mut </span>cache = <span class="self">self</span>.path_cache.lock().<span class="kw">await</span>;
 
         <span class="kw">for </span>(i, item) <span class="kw">in </span>file_path_items.iter().enumerate() {
-            <span class="kw">let </span>path_part = file_path_items[<span class="number">0</span>..=i].join(<span class="string">&quot;/&quot;</span>);
+            <span class="kw">let </span>path_part = file_path_items[<span class="number">0</span>..=i].join(<span class="string">"/"</span>);
             <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = cache.get(<span class="kw-2">&amp;</span>path_part) {
                 parent = id.to_owned();
                 <span class="kw">continue</span>;
@@ -751,16 +726,16 @@
 
     <span class="doccomment">/// Search a folder by name
     ///
-    /// returns it&#39;s file id if exists, otherwise returns `None`.
+    /// returns it's file id if exists, otherwise returns `None`.
     </span><span class="kw">pub async fn </span>gdrive_search_file(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         parent: <span class="kw-2">&amp;</span>str,
         basename: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;GdriveFile&gt;&gt; {
         <span class="kw">let </span>query =
-            <span class="macro">format!</span>(<span class="string">&quot;name = \&quot;{basename}\&quot; and \&quot;{parent}\&quot; in parents and trashed = false&quot;</span>);
+            <span class="macro">format!</span>(<span class="string">"name = \"{basename}\" and \"{parent}\" in parents and trashed = false"</span>);
         <span class="kw">let </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;https://www.googleapis.com/drive/v3/files?q={}&quot;</span>,
+            <span class="string">"https://www.googleapis.com/drive/v3/files?q={}"</span>,
             percent_encode_path(<span class="kw-2">&amp;</span>query)
         );
 
@@ -783,7 +758,7 @@
         <span class="kw">if </span>file_list.files.len() &gt; <span class="number">1 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                 ErrorKind::Unexpected,
-                <span class="string">&quot;please ensure that the file corresponding to the path is unique.&quot;</span>,
+                <span class="string">"please ensure that the file corresponding to the path is unique."</span>,
             ));
         }
 
@@ -792,18 +767,18 @@
 
     <span class="doccomment">/// Search a folder by name
     ///
-    /// returns it&#39;s file id if exists, otherwise returns `None`.
+    /// returns it's file id if exists, otherwise returns `None`.
     </span><span class="kw">pub async fn </span>gdrive_search_folder(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         parent: <span class="kw-2">&amp;</span>str,
         basename: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
         <span class="kw">let </span>query = <span class="macro">format!</span>(
-            <span class="string">&quot;name = \&quot;{}\&quot; and \&quot;{}\&quot; in parents and trashed = false and mimeType = &#39;application/vnd.google-apps.folder&#39;&quot;</span>,
+            <span class="string">"name = \"{}\" and \"{}\" in parents and trashed = false and mimeType = 'application/vnd.google-apps.folder'"</span>,
             basename, parent
         );
         <span class="kw">let </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;https://www.googleapis.com/drive/v3/files?q={}&quot;</span>,
+            <span class="string">"https://www.googleapis.com/drive/v3/files?q={}"</span>,
             percent_encode_path(query.as_str())
         );
 
@@ -840,20 +815,20 @@
     ///
     /// # Output
     ///
-    /// Returns created folder&#39;s id while success, otherwise returns an error.
+    /// Returns created folder's id while success, otherwise returns an error.
     </span><span class="kw">pub async fn </span>gdrive_create_folder(<span class="kw-2">&amp;</span><span class="self">self</span>, parent_id: <span class="kw-2">&amp;</span>str, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
-        <span class="kw">let </span>url = <span class="string">&quot;https://www.googleapis.com/drive/v3/files&quot;</span>;
+        <span class="kw">let </span>url = <span class="string">"https://www.googleapis.com/drive/v3/files"</span>;
 
         <span class="kw">let </span>content = serde_json::to_vec(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: name,
-            <span class="string">&quot;mimeType&quot;</span>: <span class="string">&quot;application/vnd.google-apps.folder&quot;</span>,
+            <span class="string">"name"</span>: name,
+            <span class="string">"mimeType"</span>: <span class="string">"application/vnd.google-apps.folder"</span>,
             <span class="comment">// If the parent is not provided, the folder will be created in the root folder.
-            </span><span class="string">&quot;parents&quot;</span>: [parent_id],
+            </span><span class="string">"parents"</span>: [parent_id],
         }))
         .map_err(new_json_serialize_error)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::post(url)
-            .header(header::CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+            .header(header::CONTENT_TYPE, <span class="string">"application/json"</span>)
             .body(AsyncBody::Bytes(Bytes::from(content)))
             .map_err(new_request_build_error)<span class="question-mark">?</span>;
 
@@ -870,13 +845,16 @@
     }
 
     <span class="kw">pub async fn </span>gdrive_stat(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
-        <span class="kw">let </span>path_id = <span class="self">self</span>.get_file_id_by_path(path).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>path_id = <span class="self">self</span>.get_file_id_by_path(path).<span class="kw">await</span><span class="question-mark">?</span>.ok_or(Error::new(
+            ErrorKind::NotFound,
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"path not found: {}"</span>, path),
+        ))<span class="question-mark">?</span>;
 
         <span class="comment">// The file metadata in the Google Drive API is very complex.
         // For now, we only need the file id, name, mime type and modified time.
         </span><span class="kw">let </span><span class="kw-2">mut </span>req = Request::get(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-            <span class="string">&quot;https://www.googleapis.com/drive/v3/files/{}?fields=id,name,mimeType,size,modifiedTime&quot;</span>,
-            path_id.as_str()
+            <span class="string">"https://www.googleapis.com/drive/v3/files/{}?fields=id,name,mimeType,size,modifiedTime"</span>,
+            path_id
         ))
             .body(AsyncBody::Empty)
             .map_err(new_request_build_error)<span class="question-mark">?</span>;
@@ -886,10 +864,15 @@
     </span>}
 
     <span class="kw">pub async fn </span>gdrive_get(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
+        <span class="kw">let </span>path_id = <span class="self">self</span>.get_file_id_by_path(path).<span class="kw">await</span><span class="question-mark">?</span>.ok_or(Error::new(
+            ErrorKind::NotFound,
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"path not found: {}"</span>, path),
+        ))<span class="question-mark">?</span>;
+
         <span class="kw">let </span>url: String = <span class="macro">format!</span>(
-            <span class="string">&quot;https://www.googleapis.com/drive/v3/files/{}?alt=media&quot;</span>,
-            <span class="self">self</span>.get_file_id_by_path(path).<span class="kw">await</span><span class="question-mark">?
-        </span>);
+            <span class="string">"https://www.googleapis.com/drive/v3/files/{}?alt=media"</span>,
+            path_id
+        );
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::get(<span class="kw-2">&amp;</span>url)
             .body(AsyncBody::Empty)
@@ -901,46 +884,18 @@
 
     <span class="kw">pub async fn </span>gdrive_list(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        path: <span class="kw-2">&amp;</span>str,
+        file_id: <span class="kw-2">&amp;</span>str,
         page_size: i32,
         next_page_token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
-        <span class="kw">let </span>file_id = <span class="self">self</span>.get_file_id_by_path(path).<span class="kw">await</span>;
-
-        <span class="comment">// when list over a no exist dir, `get_file_id_by_path` will return a NotFound Error, we should return a empty list in this case.
-        </span><span class="kw">let </span>q = <span class="kw">match </span>file_id {
-            <span class="prelude-val">Ok</span>(file_id) =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39; in parents and trashed = false&quot;</span>, file_id)
-            }
-            <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">match </span>e.kind() {
-                ErrorKind::NotFound =&gt; {
-                    <span class="kw">return </span>Response::builder()
-                        .status(StatusCode::OK)
-                        .body(IncomingAsyncBody::new(
-                            Box::new(oio::into_stream(stream::empty())),
-                            <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                        ))
-                        .map_err(|e| {
-                            Error::new(
-                                ErrorKind::Unexpected,
-                                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;failed to create a empty response for list: {}&quot;</span>, e),
-                            )
-                            .set_source(e)
-                        });
-                }
-                <span class="kw">_ </span>=&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(e);
-                }
-            },
-        };
-
+        <span class="kw">let </span>q = <span class="macro">format!</span>(<span class="string">"'{}' in parents and trashed = false"</span>, file_id);
         <span class="kw">let </span><span class="kw-2">mut </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;https://www.googleapis.com/drive/v3/files?pageSize={}&amp;q={}&quot;</span>,
+            <span class="string">"https://www.googleapis.com/drive/v3/files?pageSize={}&amp;q={}"</span>,
             page_size,
             percent_encode_path(<span class="kw-2">&amp;</span>q)
         );
         <span class="kw">if </span>!next_page_token.is_empty() {
-            url += <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;pageToken={next_page_token}&quot;</span>);
+            url += <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"&amp;pageToken={next_page_token}"</span>);
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::get(<span class="kw-2">&amp;</span>url)
@@ -957,15 +912,18 @@
         source: <span class="kw-2">&amp;</span>str,
         target: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
-        <span class="kw">let </span>file_id = <span class="self">self</span>.get_file_id_by_path(source).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>file_id = <span class="self">self</span>.get_file_id_by_path(source).<span class="kw">await</span><span class="question-mark">?</span>.ok_or(Error::new(
+            ErrorKind::NotFound,
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"source path not found: {}"</span>, source),
+        ))<span class="question-mark">?</span>;
 
         <span class="kw">let </span>parent = <span class="self">self</span>.ensure_parent_path(target).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;https://www.googleapis.com/drive/v3/files/{}&quot;</span>, file_id);
+        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">"https://www.googleapis.com/drive/v3/files/{}"</span>, file_id);
 
         <span class="kw">let </span>source_abs_path = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, source);
         <span class="kw">let </span><span class="kw-2">mut </span>source_parent: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = source_abs_path
-            .split(<span class="string">&#39;/&#39;</span>)
+            .split(<span class="string">'/'</span>)
             .filter(|<span class="kw-2">&amp;</span>x| !x.is_empty())
             .collect();
         source_parent.pop();
@@ -973,16 +931,16 @@
         <span class="kw">let </span>cache = <span class="self">self</span>.path_cache.lock().<span class="kw">await</span>;
 
         <span class="kw">let </span>file_name = build_abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>.root, target)
-            .split(<span class="string">&#39;/&#39;</span>)
+            .split(<span class="string">'/'</span>)
             .filter(|<span class="kw-2">&amp;</span>x| !x.is_empty())
             .last()
             .unwrap()
             .to_string();
 
         <span class="kw">let </span>metadata = <span class="kw-2">&amp;</span><span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: file_name,
-            <span class="string">&quot;removeParents&quot;</span>: [cache.get(<span class="kw-2">&amp;</span>source_parent.join(<span class="string">&quot;/&quot;</span>)).unwrap().to_string()],
-            <span class="string">&quot;addParents&quot;</span>: [parent],
+            <span class="string">"name"</span>: file_name,
+            <span class="string">"removeParents"</span>: [cache.get(<span class="kw-2">&amp;</span>source_parent.join(<span class="string">"/"</span>)).unwrap().to_string()],
+            <span class="string">"addParents"</span>: [parent],
         });
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::patch(url)
@@ -995,10 +953,11 @@
     </span>}
 
     <span class="kw">pub async fn </span>gdrive_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
-        <span class="kw">let </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;https://www.googleapis.com/drive/v3/files/{}&quot;</span>,
-            <span class="self">self</span>.get_file_id_by_path(path).<span class="kw">await</span><span class="question-mark">?
-        </span>);
+        <span class="kw">let </span>file_id = <span class="self">self</span>.get_file_id_by_path(path).<span class="kw">await</span><span class="question-mark">?</span>.ok_or(Error::new(
+            ErrorKind::NotFound,
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"path not found: {}"</span>, path),
+        ))<span class="question-mark">?</span>;
+        <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">"https://www.googleapis.com/drive/v3/files/{}"</span>, file_id);
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::delete(<span class="kw-2">&amp;</span>url)
             .body(AsyncBody::Empty)
@@ -1018,31 +977,31 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
         <span class="kw">let </span>parent = <span class="self">self</span>.ensure_parent_path(path).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>url = <span class="string">&quot;https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&quot;</span>;
+        <span class="kw">let </span>url = <span class="string">"https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"</span>;
 
-        <span class="kw">let </span>file_name = path.split(<span class="string">&#39;/&#39;</span>).filter(|<span class="kw-2">&amp;</span>x| !x.is_empty()).last().unwrap();
+        <span class="kw">let </span>file_name = path.split(<span class="string">'/'</span>).filter(|<span class="kw-2">&amp;</span>x| !x.is_empty()).last().unwrap();
 
         <span class="kw">let </span>metadata = <span class="kw-2">&amp;</span><span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: file_name,
-            <span class="string">&quot;parents&quot;</span>: [parent],
+            <span class="string">"name"</span>: file_name,
+            <span class="string">"parents"</span>: [parent],
         });
 
-        <span class="kw">let </span>req = Request::post(url).header(<span class="string">&quot;X-Upload-Content-Length&quot;</span>, size);
+        <span class="kw">let </span>req = Request::post(url).header(<span class="string">"X-Upload-Content-Length"</span>, size);
 
         <span class="kw">let </span>multipart = Multipart::new()
             .part(
-                FormDataPart::new(<span class="string">&quot;metadata&quot;</span>)
+                FormDataPart::new(<span class="string">"metadata"</span>)
                     .header(
                         header::CONTENT_TYPE,
-                        <span class="string">&quot;application/json; charset=UTF-8&quot;</span>.parse().unwrap(),
+                        <span class="string">"application/json; charset=UTF-8"</span>.parse().unwrap(),
                     )
                     .content(metadata.to_string()),
             )
             .part(
-                FormDataPart::new(<span class="string">&quot;file&quot;</span>)
+                FormDataPart::new(<span class="string">"file"</span>)
                     .header(
                         header::CONTENT_TYPE,
-                        <span class="string">&quot;application/octet-stream&quot;</span>.parse().unwrap(),
+                        <span class="string">"application/octet-stream"</span>.parse().unwrap(),
                     )
                     .content(body),
             );
@@ -1066,14 +1025,14 @@
         body: Bytes,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;IncomingAsyncBody&gt;&gt; {
         <span class="kw">let </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;https://www.googleapis.com/upload/drive/v3/files/{}?uploadType=media&quot;</span>,
+            <span class="string">"https://www.googleapis.com/upload/drive/v3/files/{}?uploadType=media"</span>,
             file_id
         );
 
         <span class="kw">let </span><span class="kw-2">mut </span>req = Request::patch(url)
-            .header(header::CONTENT_TYPE, <span class="string">&quot;application/octet-stream&quot;</span>)
+            .header(header::CONTENT_TYPE, <span class="string">"application/octet-stream"</span>)
             .header(header::CONTENT_LENGTH, size)
-            .header(<span class="string">&quot;X-Upload-Content-Length&quot;</span>, size)
+            .header(<span class="string">"X-Upload-Content-Length"</span>, size)
             .body(AsyncBody::Bytes(body))
             .map_err(new_request_build_error)<span class="question-mark">?</span>;
 
@@ -1086,16 +1045,16 @@
         <span class="kw">let </span><span class="kw-2">mut </span>signer = <span class="self">self</span>.signer.lock().<span class="kw">await</span>;
 
         <span class="kw">if </span>!signer.access_token.is_empty() &amp;&amp; signer.expires_in &gt; Utc::now() {
-            <span class="kw">let </span>value = <span class="macro">format!</span>(<span class="string">&quot;Bearer {}&quot;</span>, signer.access_token)
+            <span class="kw">let </span>value = <span class="macro">format!</span>(<span class="string">"Bearer {}"</span>, signer.access_token)
                 .parse()
-                .expect(<span class="string">&quot;access token must be valid header value&quot;</span>);
+                .expect(<span class="string">"access token must be valid header value"</span>);
 
             req.headers_mut().insert(header::AUTHORIZATION, value);
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
         <span class="kw">let </span>url = <span class="macro">format!</span>(
-            <span class="string">&quot;https://oauth2.googleapis.com/token?refresh_token={}&amp;client_id={}&amp;client_secret={}&amp;grant_type=refresh_token&quot;</span>,
+            <span class="string">"https://oauth2.googleapis.com/token?refresh_token={}&amp;client_id={}&amp;client_secret={}&amp;grant_type=refresh_token"</span>,
             signer.refresh_token, signer.client_id, signer.client_secret
         );
 
@@ -1122,7 +1081,7 @@
             }
         }
 
-        <span class="kw">let </span>auth_header_content = <span class="macro">format!</span>(<span class="string">&quot;Bearer {}&quot;</span>, signer.access_token);
+        <span class="kw">let </span>auth_header_content = <span class="macro">format!</span>(<span class="string">"Bearer {}"</span>, signer.access_token);
         req.headers_mut()
             .insert(header::AUTHORIZATION, auth_header_content.parse().unwrap());
 
@@ -1163,7 +1122,7 @@
 // This is a complex struct, but we only add the fields we need.
 // refer to https://developers.google.com/drive/api/reference/rest/v3/files#File
 </span><span class="attr">#[derive(Deserialize, Debug)]
-#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(rename_all = <span class="string">"camelCase"</span>)]
 </span><span class="kw">pub struct </span>GdriveFile {
     <span class="kw">pub </span>mime_type: String,
     <span class="kw">pub </span>id: String,
@@ -1179,7 +1138,7 @@
 
 <span class="comment">// refer to https://developers.google.com/drive/api/reference/rest/v3/files/list
 </span><span class="attr">#[derive(Deserialize)]
-#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(rename_all = <span class="string">"camelCase"</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>GdriveFileList {
     <span class="kw">pub</span>(<span class="kw">crate</span>) files: Vec&lt;GdriveFile&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) next_page_token: <span class="prelude-ty">Option</span>&lt;String&gt;,

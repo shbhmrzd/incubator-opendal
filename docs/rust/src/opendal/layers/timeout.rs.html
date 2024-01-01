@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/layers/timeout.rs`."><title>timeout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../opendal/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/src/layers/timeout.rs`."><title>timeout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="opendal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (3cdd004e5 2023-12-29)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -446,20 +447,19 @@
 <a href="#446" id="446">446</a>
 <a href="#447" id="447">447</a>
 <a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -489,16 +489,16 @@
 ///   operation.
 ///
 /// Besides, we will also set a slow speed for each IO operation. If the IO
-/// operation&#39;s speed is lower than the slow speed, we will return a timeout error
+/// operation's speed is lower than the slow speed, we will return a timeout error
 /// instead of kept waiting for it.
 ///
 /// For examples, if we set timeout to 60 seconds and speed to 1MiB/s, then:
 ///
-/// - If `stat` didn&#39;t return in 60 seconds, we will return a timeout error.
-/// - If `Reader::read` didn&#39;t return in 60 seconds, we will return a timeout error.
+/// - If `stat` didn't return in 60 seconds, we will return a timeout error.
+/// - If `Reader::read` didn't return in 60 seconds, we will return a timeout error.
 /// - For `Writer::write(vec![1024*1024*1024])`
-///   - didn&#39;t return in 60s, it&#39;s ok, we will keep waiting.
-///   - didn&#39;t return in 1024s (1GiB/1MiB), we will return a timeout error.
+///   - didn't return in 60s, it's ok, we will keep waiting.
+///   - didn't return in 1024s (1GiB/1MiB), we will return a timeout error.
 ///
 /// # Default
 ///
@@ -515,7 +515,7 @@
 /// use opendal::Scheme;
 ///
 /// let _ = Operator::new(services::Memory::default())
-///     .expect(&quot;must init&quot;)
+///     .expect("must init")
 ///     .layer(TimeoutLayer::default())
 ///     .finish();
 /// ```
@@ -560,7 +560,7 @@
     ///
     /// This function will panic if speed is 0.
     </span><span class="kw">pub fn </span>with_speed(<span class="kw-2">mut </span><span class="self">self</span>, speed: u64) -&gt; <span class="self">Self </span>{
-        <span class="macro">assert_ne!</span>(speed, <span class="number">0</span>, <span class="string">&quot;TimeoutLayer speed must not be 0&quot;</span>);
+        <span class="macro">assert_ne!</span>(speed, <span class="number">0</span>, <span class="string">"TimeoutLayer speed must not be 0"</span>);
 
         <span class="self">self</span>.speed = speed;
         <span class="self">self
@@ -588,7 +588,8 @@
     speed: u64,
 }
 
-<span class="attr">#[async_trait]
+<span class="attr">#[cfg_attr(not(target_arch = <span class="string">"wasm32"</span>), async_trait)]
+#[cfg_attr(target_arch = <span class="string">"wasm32"</span>, async_trait(<span class="question-mark">?</span>Send))]
 </span><span class="kw">impl</span>&lt;A: Accessor&gt; LayeredAccessor <span class="kw">for </span>TimeoutAccessor&lt;A&gt; {
     <span class="kw">type </span>Inner = A;
     <span class="kw">type </span>Reader = TimeoutWrapper&lt;A::Reader&gt;;
@@ -606,9 +607,9 @@
         tokio::time::timeout(<span class="self">self</span>.timeout, <span class="self">self</span>.inner.read(path, args))
             .<span class="kw">await
             </span>.map_err(|<span class="kw">_</span>| {
-                Error::new(ErrorKind::Unexpected, <span class="string">&quot;operation timeout&quot;</span>)
+                Error::new(ErrorKind::Unexpected, <span class="string">"operation timeout"</span>)
                     .with_operation(Operation::Read)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()
             })<span class="question-mark">?
             </span>.map(|(rp, r)| (rp, TimeoutWrapper::new(r, <span class="self">self</span>.timeout, <span class="self">self</span>.speed)))
@@ -618,9 +619,9 @@
         tokio::time::timeout(<span class="self">self</span>.timeout, <span class="self">self</span>.inner.write(path, args))
             .<span class="kw">await
             </span>.map_err(|<span class="kw">_</span>| {
-                Error::new(ErrorKind::Unexpected, <span class="string">&quot;operation timeout&quot;</span>)
+                Error::new(ErrorKind::Unexpected, <span class="string">"operation timeout"</span>)
                     .with_operation(Operation::Write)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()
             })<span class="question-mark">?
             </span>.map(|(rp, r)| (rp, TimeoutWrapper::new(r, <span class="self">self</span>.timeout, <span class="self">self</span>.speed)))
@@ -630,9 +631,9 @@
         tokio::time::timeout(<span class="self">self</span>.timeout, <span class="self">self</span>.inner.list(path, args))
             .<span class="kw">await
             </span>.map_err(|<span class="kw">_</span>| {
-                Error::new(ErrorKind::Unexpected, <span class="string">&quot;operation timeout&quot;</span>)
+                Error::new(ErrorKind::Unexpected, <span class="string">"operation timeout"</span>)
                     .with_operation(Operation::List)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()
             })<span class="question-mark">?
             </span>.map(|(rp, r)| (rp, TimeoutWrapper::new(r, <span class="self">self</span>.timeout, <span class="self">self</span>.speed)))
@@ -680,7 +681,7 @@
 }
 
 <span class="kw">impl</span>&lt;R: oio::Read&gt; oio::Read <span class="kw">for </span>TimeoutWrapper&lt;R&gt; {
-    <span class="kw">fn </span>poll_read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize&gt;&gt; {
+    <span class="kw">fn </span>poll_read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">'_</span>&gt;, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize&gt;&gt; {
         <span class="kw">match </span><span class="self">self</span>.start {
             <span class="prelude-val">Some</span>(start) =&gt; {
                 <span class="kw">if </span>start.elapsed() &gt; <span class="self">self</span>.timeout {
@@ -689,10 +690,10 @@
 
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::new(
                         ErrorKind::Unexpected,
-                        <span class="string">&quot;operation timeout&quot;</span>,
+                        <span class="string">"operation timeout"</span>,
                     )
                     .with_operation(ReadOperation::Read)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()));
                 }
             }
@@ -710,7 +711,7 @@
         }
     }
 
-    <span class="kw">fn </span>poll_seek(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;, pos: SeekFrom) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;u64&gt;&gt; {
+    <span class="kw">fn </span>poll_seek(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">'_</span>&gt;, pos: SeekFrom) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;u64&gt;&gt; {
         <span class="kw">match </span><span class="self">self</span>.start {
             <span class="prelude-val">Some</span>(start) =&gt; {
                 <span class="kw">if </span>start.elapsed() &gt; <span class="self">self</span>.timeout {
@@ -719,10 +720,10 @@
 
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::new(
                         ErrorKind::Unexpected,
-                        <span class="string">&quot;operation timeout&quot;</span>,
+                        <span class="string">"operation timeout"</span>,
                     )
                     .with_operation(ReadOperation::Seek)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()));
                 }
             }
@@ -740,7 +741,7 @@
         }
     }
 
-    <span class="kw">fn </span>poll_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;Bytes&gt;&gt;&gt; {
+    <span class="kw">fn </span>poll_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">'_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;Bytes&gt;&gt;&gt; {
         <span class="kw">match </span><span class="self">self</span>.start {
             <span class="prelude-val">Some</span>(start) =&gt; {
                 <span class="kw">if </span>start.elapsed() &gt; <span class="self">self</span>.timeout {
@@ -749,10 +750,10 @@
 
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(Error::new(
                         ErrorKind::Unexpected,
-                        <span class="string">&quot;operation timeout&quot;</span>,
+                        <span class="string">"operation timeout"</span>,
                     )
                     .with_operation(ReadOperation::Next)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary())));
                 }
             }
@@ -771,9 +772,8 @@
     }
 }
 
-<span class="attr">#[async_trait]
-</span><span class="kw">impl</span>&lt;R: oio::Write&gt; oio::Write <span class="kw">for </span>TimeoutWrapper&lt;R&gt; {
-    <span class="kw">fn </span>poll_write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;, bs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>oio::WriteBuf) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize&gt;&gt; {
+<span class="kw">impl</span>&lt;R: oio::Write&gt; oio::Write <span class="kw">for </span>TimeoutWrapper&lt;R&gt; {
+    <span class="kw">fn </span>poll_write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">'_</span>&gt;, bs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>oio::WriteBuf) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize&gt;&gt; {
         <span class="kw">match </span><span class="self">self</span>.start {
             <span class="prelude-val">Some</span>(start) =&gt; {
                 <span class="kw">if </span>start.elapsed() &gt; <span class="self">self</span>.timeout {
@@ -782,10 +782,10 @@
 
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::new(
                         ErrorKind::Unexpected,
-                        <span class="string">&quot;operation timeout&quot;</span>,
+                        <span class="string">"operation timeout"</span>,
                     )
                     .with_operation(WriteOperation::Write)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()));
                 }
             }
@@ -803,7 +803,7 @@
         }
     }
 
-    <span class="kw">fn </span>poll_abort(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;()&gt;&gt; {
+    <span class="kw">fn </span>poll_abort(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">'_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;()&gt;&gt; {
         <span class="kw">match </span><span class="self">self</span>.start {
             <span class="prelude-val">Some</span>(start) =&gt; {
                 <span class="kw">if </span>start.elapsed() &gt; <span class="self">self</span>.timeout {
@@ -812,10 +812,10 @@
 
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::new(
                         ErrorKind::Unexpected,
-                        <span class="string">&quot;operation timeout&quot;</span>,
+                        <span class="string">"operation timeout"</span>,
                     )
                     .with_operation(WriteOperation::Abort)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()));
                 }
             }
@@ -833,7 +833,7 @@
         }
     }
 
-    <span class="kw">fn </span>poll_close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;()&gt;&gt; {
+    <span class="kw">fn </span>poll_close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">'_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;()&gt;&gt; {
         <span class="kw">match </span><span class="self">self</span>.start {
             <span class="prelude-val">Some</span>(start) =&gt; {
                 <span class="kw">if </span>start.elapsed() &gt; <span class="self">self</span>.timeout {
@@ -842,10 +842,10 @@
 
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::new(
                         ErrorKind::Unexpected,
-                        <span class="string">&quot;operation timeout&quot;</span>,
+                        <span class="string">"operation timeout"</span>,
                     )
                     .with_operation(WriteOperation::Close)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()));
                 }
             }
@@ -864,9 +864,8 @@
     }
 }
 
-<span class="attr">#[async_trait]
-</span><span class="kw">impl</span>&lt;R: oio::List&gt; oio::List <span class="kw">for </span>TimeoutWrapper&lt;R&gt; {
-    <span class="kw">fn </span>poll_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;oio::Entry&gt;&gt;&gt; {
+<span class="kw">impl</span>&lt;R: oio::List&gt; oio::List <span class="kw">for </span>TimeoutWrapper&lt;R&gt; {
+    <span class="kw">fn </span>poll_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">'_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;oio::Entry&gt;&gt;&gt; {
         <span class="kw">match </span><span class="self">self</span>.start {
             <span class="prelude-val">Some</span>(start) =&gt; {
                 <span class="kw">if </span>start.elapsed() &gt; <span class="self">self</span>.timeout {
@@ -875,10 +874,10 @@
 
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::new(
                         ErrorKind::Unexpected,
-                        <span class="string">&quot;operation timeout&quot;</span>,
+                        <span class="string">"operation timeout"</span>,
                     )
                     .with_operation(ListOperation::Next)
-                    .with_context(<span class="string">&quot;timeout&quot;</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
+                    .with_context(<span class="string">"timeout"</span>, <span class="self">self</span>.timeout.as_secs_f64().to_string())
                     .set_temporary()));
                 }
             }
